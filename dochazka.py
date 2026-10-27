@@ -1,4 +1,5 @@
 import csv
+import json
 from datetime import datetime
 
 from rich.console import Console
@@ -37,8 +38,28 @@ def nacti_data(nazev_souboru):
     return data
 
 
+def uloz_data_json(data, nazev_souboru="dochazka.json"):
+    """Uloží data do JSON souboru jako čitelný seznam záznamů."""
+    export = []
+    for zaznam in data:
+        export.append(
+            {
+                "číslo čipu": zaznam["číslo čipu"],
+                "zaměstnanec": zaznam["zaměstnanec"],
+                "příchod": zaznam["příchod"].strftime("%Y-%m-%d %H:%M"),
+                "odchod": zaznam["odchod"].strftime("%Y-%m-%d %H:%M"),
+            }
+        )
+
+    with open(nazev_souboru, "w", encoding="utf-8") as soubor:
+        json.dump(export, soubor, ensure_ascii=False, indent=2)
+
+    console.print(f"[green]Data byla uložena do JSON souboru: {nazev_souboru}[/green]")
+
+
 def main():
     data = nacti_data("dochazka.csv")
+    uloz_data_json(data)
 
     tabulka = Table(title="Evidence docházky")
 
